@@ -8,6 +8,8 @@ import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { StorageModule } from './storage/storage.module';
 import { PropafricModule } from './propafric/propafric.module';
+import { PropertiesModule } from './properties/properties.module';
+import { LeadsModule } from './leads/leads.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
@@ -23,6 +25,8 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     MailModule,
     StorageModule,
     PropafricModule,
+    PropertiesModule,
+    LeadsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
