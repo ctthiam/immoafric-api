@@ -101,4 +101,66 @@ export class AgencyService {
     const agency = await this.getAgency(userId);
     return this.prisma.agency.update({ where: { id: agency.id }, data });
   }
+
+  // ─── Public directory ──────────────────────────────────
+
+  async getPublicDirectory(query: { q?: string; country?: string; page?: number; limit?: number }) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 12;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+    if (query.country) where.country = query.country;
+    if (query.q) {
+      where.OR = [
+        { name: { contains: query.q, mode: 'insensitive' } },
+        { city: { contains: query.q, mode: 'insensitive' } },
+      ];
+    }
+
+    const [agencies, total] = await this.prisma.$transaction([
+      this.prisma.agency.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: [{ isVerified: 'desc' }, { plan: 'desc' }, { name: 'asc' }],
+        select: {
+          id: true, name: true, slug: true, description: true, logoUrl: true,
+          city: true, country: true, isVerified: true, plan: true, rating: true, reviewsCount: true,
+          _count: { select: { properties: { where: { status: 'published' } } } },
+        },
+      }),
+      this.prisma.agency.count({ where }),
+    ]);
+
+    return { agencies, total, page, totalPages: Math.ceil(total / limit) };
+  }
+
+  async getPublicProfile(slug: string) {
+    const agency = await this.prisma.agency.findUnique({
+      where: { slug },
+      select: {
+        id: true, name: true, slug: true, description: true, logoUrl: true, coverUrl: true,
+        phone: true, email: true, website: true, city: true, country: true, licenseNumber: true,
+        isVerified: true, plan: true, rating: true, reviewsCount: true,
+        properties: {
+          where: { status: 'published' },
+          take: 9,
+          orderBy: { publishedAt: 'desc' },
+          select: {
+            id: true, slug: true, title: true, price: true, currency: true, city: true, type: true,
+            images: { where: { isCover: true }, select: { url: true }, take: 1 },
+          },
+        },
+        _count: { select: { properties: { where: { status: 'published' } } } },
+      },
+    });
+
+    if (!agency) throw new NotFoundException('Agence introuvable');
+
+    return {
+      ...agency,
+      propertiesCount: agency._count.properties,
+    };
+  }
 }
