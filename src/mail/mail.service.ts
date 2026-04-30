@@ -4,12 +4,17 @@ import { Resend } from 'resend';
 
 @Injectable()
 export class MailService {
-  private resend: Resend;
+  private resend!: Resend;
   private readonly logger = new Logger(MailService.name);
   private readonly from = 'ImmoAfric <no-reply@immoafric.com>';
 
   constructor(private config: ConfigService) {
-    this.resend = new Resend(config.get('RESEND_API_KEY'));
+    const apiKey = config.get<string>('RESEND_API_KEY');
+    if (apiKey) {
+      this.resend = new Resend(apiKey);
+    } else {
+      this.logger.warn('RESEND_API_KEY manquante — emails désactivés (staging sans email)');
+    }
   }
 
   async sendEmailVerification(email: string, firstName: string, token: string) {
@@ -90,6 +95,10 @@ export class MailService {
   }
 
   private async send(to: string, subject: string, html: string) {
+    if (!this.resend) {
+      this.logger.warn(`Email non envoyé (pas de clé Resend) — sujet: ${subject}`);
+      return;
+    }
     try {
       await this.resend.emails.send({ from: this.from, to, subject, html });
     } catch (error) {
