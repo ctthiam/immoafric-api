@@ -10,7 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import * as speakeasy from 'speakeasy';
 import * as QRCode from 'qrcode';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
 import { RegisterDto } from './dto/register.dto';
@@ -31,7 +31,7 @@ export class AuthService {
     if (existing) throw new ConflictException('Cet email est déjà utilisé');
 
     const passwordHash = await bcrypt.hash(dto.password, 12);
-    const emailVerToken = uuidv4();
+    const emailVerToken = randomUUID();
 
     const user = await this.prisma.user.create({
       data: {
@@ -166,7 +166,7 @@ export class AuthService {
       return { success: true, data: null, message: 'Si cet email existe, vous recevrez un lien.' };
     }
 
-    const token = uuidv4();
+    const token = randomUUID();
     const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1h
 
     await this.prisma.user.update({
