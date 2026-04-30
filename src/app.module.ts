@@ -17,6 +17,10 @@ import { BlogModule } from './blog/blog.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { AlertsModule } from './alerts/alerts.module';
 import { EstimationModule } from './estimation/estimation.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { DirectoryModule } from './directory/directory.module';
+import { ReferralModule } from './referral/referral.module';
+import { AdminModule } from './admin/admin.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
@@ -41,6 +45,10 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     FavoritesModule,
     AlertsModule,
     EstimationModule,
+    SubscriptionsModule,
+    DirectoryModule,
+    ReferralModule,
+    AdminModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
