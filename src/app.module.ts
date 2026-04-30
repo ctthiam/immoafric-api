@@ -13,6 +13,10 @@ import { LeadsModule } from './leads/leads.module';
 import { TasksModule } from './tasks/tasks.module';
 import { MessagingModule } from './messaging/messaging.module';
 import { AgencyModule } from './agency/agency.module';
+import { BlogModule } from './blog/blog.module';
+import { FavoritesModule } from './favorites/favorites.module';
+import { AlertsModule } from './alerts/alerts.module';
+import { EstimationModule } from './estimation/estimation.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
@@ -33,6 +37,10 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     TasksModule,
     MessagingModule,
     AgencyModule,
+    BlogModule,
+    FavoritesModule,
+    AlertsModule,
+    EstimationModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
