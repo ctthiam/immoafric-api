@@ -105,6 +105,60 @@ export class AdminService {
     return this.prisma.user.update({ where: { id: userId }, data: { isActive } });
   }
 
+  async getPayments(query: { page?: number; plan?: string }) {
+    const page = query.page ?? 1;
+    const limit = 20;
+    const skip = (page - 1) * limit;
+    const where: any = {};
+    if (query.plan) where.plan = query.plan;
+
+    const [subs, total] = await this.prisma.$transaction([
+      this.prisma.subscription.findMany({
+        where, skip, take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: { agency: { select: { name: true, slug: true, city: true, country: true } } },
+      }),
+      this.prisma.subscription.count({ where }),
+    ]);
+
+    return { subscriptions: subs, total, page, totalPages: Math.ceil(total / limit) };
+  }
+
+  async getDirectory(query: { page?: number; q?: string; category?: string }) {
+    const page = query.page ?? 1;
+    const limit = 20;
+    const skip = (page - 1) * limit;
+    const where: any = {};
+    if (query.q) where.name = { contains: query.q, mode: 'insensitive' };
+    if (query.category) where.category = query.category;
+
+    const [pros, total] = await this.prisma.$transaction([
+      this.prisma.professional.findMany({
+        where, skip, take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.professional.count({ where }),
+    ]);
+
+    return { professionals: pros, total, page, totalPages: Math.ceil(total / limit) };
+  }
+
+  async updateProfessional(id: string, data: { isVerified?: boolean; isFeatured?: boolean }) {
+    return this.prisma.professional.update({ where: { id }, data });
+  }
+
+  async getPropafricAgencies() {
+    return this.prisma.agency.findMany({
+      where: { isPropafric: true },
+      orderBy: { propafrLastSync: 'desc' },
+      select: {
+        id: true, name: true, slug: true, city: true, country: true,
+        propafrAgencyId: true, propafrLastSync: true, propafrSyncStatus: true, plan: true,
+        _count: { select: { properties: true } },
+      },
+    });
+  }
+
   async getBlogPosts(query: { page?: number; status?: string }) {
     const page = query.page ?? 1;
     const limit = 20;

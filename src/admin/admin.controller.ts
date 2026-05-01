@@ -40,4 +40,24 @@ export class AdminController {
   blogPosts(@Query('page') page?: string, @Query('status') status?: string) {
     return this.admin.getBlogPosts({ page: page ? +page : 1, status });
   }
+
+  @Get('payments')
+  payments(@Query('page') page?: string, @Query('plan') plan?: string) {
+    return this.admin.getPayments({ page: page ? +page : 1, plan });
+  }
+
+  @Get('directory')
+  directory(@Query('page') page?: string, @Query('q') q?: string, @Query('category') category?: string) {
+    return this.admin.getDirectory({ page: page ? +page : 1, q, category });
+  }
+
+  @Patch('directory/:id')
+  updateProfessional(@Param('id') id: string, @Body() dto: { isVerified?: boolean; isFeatured?: boolean }) {
+    return this.admin.updateProfessional(id, dto);
+  }
+
+  @Get('propafric-sync')
+  propafricSync() {
+    return this.admin.getPropafricAgencies();
+  }
 }
