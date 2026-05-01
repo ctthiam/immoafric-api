@@ -119,7 +119,7 @@ export class AuthService {
 
     return {
       success: true,
-      data: { user: safeUser },
+      data: { user: safeUser, accessToken },
       message: 'Connexion réussie',
     };
   }
