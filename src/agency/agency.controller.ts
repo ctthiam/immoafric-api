@@ -14,6 +14,11 @@ export class AgencyController {
     return this.service.getKpis(userId);
   }
 
+  @Get('stats')
+  getStats(@CurrentUser('id') userId: string) {
+    return this.service.getStats(userId);
+  }
+
   @Get('profile')
   getProfile(@CurrentUser('id') userId: string) {
     return this.service.getProfile(userId);
