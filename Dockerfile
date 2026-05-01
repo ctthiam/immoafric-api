@@ -14,9 +14,11 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY prisma ./prisma/
-RUN npm ci --omit=dev && npx prisma generate && npm cache clean --force
+RUN npm ci --omit=dev && npm cache clean --force
 
 COPY --from=builder /app/dist ./dist
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x /app/entrypoint.sh && npx prisma generate
 
 EXPOSE 3001
-CMD ["sh", "-c", "npx prisma db push --skip-generate && node dist/main"]
+CMD ["/app/entrypoint.sh"]
