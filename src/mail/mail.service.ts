@@ -94,6 +94,37 @@ export class MailService {
     `);
   }
 
+  async sendAlertMatch(
+    email: string,
+    firstName: string,
+    alertName: string,
+    properties: Array<{ slug: string; title: string; price: any; currency: string; city: string }>,
+  ) {
+    const frontendUrl = this.config.get('FRONTEND_URL') ?? 'http://localhost:3000';
+    const rows = properties.map(p => `
+      <tr>
+        <td style="padding:10px 0;border-bottom:1px solid #f0f0f0;">
+          <a href="${frontendUrl}/annonces/${p.slug}" style="font-weight:600;color:#0F1B2D;text-decoration:none;">${p.title}</a><br>
+          <span style="color:#C9861A;font-weight:700;">${Number(p.price).toLocaleString('fr')} ${p.currency}</span>
+          <span style="color:#888;font-size:12px;"> — ${p.city}</span>
+        </td>
+      </tr>
+    `).join('');
+
+    await this.send(email, `${properties.length} nouveau${properties.length > 1 ? 'x' : ''} bien${properties.length > 1 ? 's' : ''} — alerte "${alertName}"`, `
+      <h2>Bonjour ${firstName},</h2>
+      <p>${properties.length} nouveau${properties.length > 1 ? 'x' : ''} bien${properties.length > 1 ? 's' : ''} correspond${properties.length > 1 ? 'ent' : ''} à votre alerte <strong>${alertName}</strong> :</p>
+      <table style="width:100%;border-collapse:collapse;">${rows}</table>
+      <a href="${frontendUrl}/annonces" style="background:#C9861A;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;display:inline-block;margin:20px 0;">
+        Voir toutes les annonces
+      </a>
+      <p style="color:#888;font-size:12px;">
+        Pour gérer vos alertes : <a href="${frontendUrl}/alertes" style="color:#C9861A;">${frontendUrl}/alertes</a>
+      </p>
+      <p>L'équipe ImmoAfric</p>
+    `);
+  }
+
   private async send(to: string, subject: string, html: string) {
     if (!this.resend) {
       this.logger.warn(`Email non envoyé (pas de clé Resend) — sujet: ${subject}`);
